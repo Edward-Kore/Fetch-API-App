@@ -1,0 +1,75 @@
+const APIKey = "Not here"; //it must be hidden.
+const APIURL = `https://pixabay.com/api/?key=${APIKey}&`;
+
+const searchBox = document.getElementById("searchBox");
+const searchButton = document.getElementById("searchButton");
+const results = document.getElementById("results");
+let page = 1;
+const pre = document.getElementById("pre");
+const next = document.getElementById("next");
+
+let emptyRes = document.createElement("p");
+emptyRes.className = "error";
+
+// Validation on emty or wrong words in the search box
+
+searchButton.addEventListener("click", function () {
+  if (searchBox.value == "") {
+    results.appendChild(emptyRes);
+    emptyRes.innerHTML = "Please, fill Search field like cat, dog, etc.";
+  } else if (results.childElementCount == 0) {
+    results.appendChild(emptyRes);
+    emptyRes.innerHTML = "No picture related to the input, please try again.";
+  } else {
+    search(searchBox.value);
+  }
+});
+
+/* console.log(results); */
+
+next.addEventListener("click", function () {
+  page++;
+  search(searchBox.value);
+});
+pre.addEventListener("click", function () {
+  if (page > 1) {
+    page--;
+    search(searchBox.value);
+  }
+});
+
+// Fetching API
+async function search(query) {
+  const res = await fetch(`${APIURL}q=${query}&per_page=20&page=${page}`);
+  const data = await res.json();
+  /* console.log(data); */
+  displayData(data);
+}
+
+// Displaying data
+
+function displayData(data) {
+  results.innerHTML = "";
+  for (let i = 0; i < data.hits.length; i++) {
+    const parentDiv = document.createElement("div");
+
+    const a = document.createElement("a");
+    a.href = data.hits[i].largeImageURL;
+
+    const div = document.createElement("div");
+    div.className = "col-2 border rounded m-2 p-0 ";
+
+    const img = document.createElement("img");
+    img.alt = data.hits[i].tags;
+    img.src = data.hits[i].previewURL;
+    Image.className = "img-fluid";
+
+    const p = document.createElement("p");
+    p.innerText = data.hits[i].tags;
+
+    a.appendChild(img);
+    div.appendChild(a);
+    div.appendChild(p);
+    results.appendChild(div);
+  }
+}
